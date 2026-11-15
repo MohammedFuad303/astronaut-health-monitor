@@ -25,6 +25,22 @@ for column in ["sleep_hours", "resting_hr", "mood_score"]:
         "deviation_sd": round(deviation, 1),
     })
 
+DIRECTION = {"sleep_hours": -1, "resting_hr": 1, "mood_score": -1}
+LABELS = {"sleep_hours": "Sleep", "resting_hr": "Heart rate", "mood_score": "Mood"}
+
+st.subheader("Current status")
+cols = st.columns(3)
+for col, row in zip(cols, rows):
+    name = row["indicator"]
+    concern = row["deviation_sd"] * DIRECTION[name]
+    text = f'{LABELS[name]}: {row["recent"]} (baseline {row["baseline"]})'
+    if concern >= 2:
+        col.error("🔴 " + text)
+    elif concern >= 1:
+        col.warning("🟡 " + text)
+    else:
+        col.success("🟢 " + text)
+
 st.subheader("Change from personal baseline")
 st.table(pd.DataFrame(rows))
 
