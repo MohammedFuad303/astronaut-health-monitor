@@ -47,3 +47,22 @@ st.table(pd.DataFrame(rows))
 for column in ["sleep_hours", "resting_hr", "mood_score"]:
     fig = px.line(df, x="date", y=column, title=column.replace("_", " ").title())
     st.plotly_chart(fig, use_container_width=True)
+
+
+st.subheader("Daily check-in")
+with st.form("checkin"):
+    sleep_in = st.number_input("Sleep last night (hours)", 0.0, 14.0, 7.0, 0.1)
+    hr_in = st.number_input("Resting heart rate (bpm)", 30, 150, 60)
+    mood_in = st.slider("Mood today (1-10)", 1, 10, 7)
+    submitted = st.form_submit_button("Save check-in")
+
+
+if submitted:
+    new_row = pd.DataFrame([{
+        "date": df["date"].max() + pd.Timedelta(days=1),
+        "sleep_hours": sleep_in,
+        "resting_hr": hr_in,
+        "mood_score": mood_in,
+    }])
+    new_row.to_csv("health_data.csv", mode="a", header=False, index=False)
+    st.rerun()
