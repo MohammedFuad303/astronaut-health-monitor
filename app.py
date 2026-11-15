@@ -66,3 +66,35 @@ if submitted:
     }])
     new_row.to_csv("health_data.csv", mode="a", header=False, index=False)
     st.rerun()
+
+
+ADVICE = {
+    "sleep_hours": {
+        "yellow": "Sleep is trending down. Keep a fixed sleep schedule and dim lights before bed.",
+        "red": "Sleep is well below baseline. Report to the flight surgeon and review the sleep schedule.",
+    },
+    "resting_hr": {
+        "yellow": "Resting heart rate is rising. Review exercise load and hydration.",
+        "red": "Resting heart rate is well above baseline. Schedule a cardiovascular check with the flight surgeon.",
+    },
+    "mood_score": {
+        "yellow": "Mood is declining. Schedule a private call with family or a friend.",
+        "red": "Mood is well below baseline. Contact the behavioral health team.",
+    },
+}
+
+st.subheader("Recommended actions")
+any_alert = False
+for row in rows:
+    name = row["indicator"]
+    concern = row["deviation_sd"] * DIRECTION[name]
+    if concern >= 2:
+        st.error("🔴 " + ADVICE[name]["red"])
+        any_alert = True
+    elif concern >= 1:
+        st.warning("🟡 " + ADVICE[name]["yellow"])
+        any_alert = True
+if not any_alert:
+    st.success("🟢 All indicators are within normal range. Keep up the routine.")
+
+st.caption("Prototype for the NASA Space Apps Challenge. Not medical advice.")
